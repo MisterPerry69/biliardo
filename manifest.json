@@ -1,0 +1,16 @@
+{
+  "name": "Biliardo Tracker",
+  "short_name": "Biliardo",
+  "start_url": "https://www.cuttysark.it/cutty/cucina/amministrazione.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b0b",
+  "theme_color": "#f39c12",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
