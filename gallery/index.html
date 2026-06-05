@@ -14,9 +14,9 @@
       --felt-dark: #083d20;
       --felt-deep: #051f10;
       --felt-light: #12743b;
-      --gold: #c9a84c;
-      --gold-light: #e8c96a;
-      --gold-dim: rgba(201,168,76,0.18);
+      --gold: var(--chalk, #f0ebe0);
+      --gold-light: var(--chalk, #f0ebe0);
+      --gold-dim: rgba(240,235,224,0.18);
       --chalk: #f0ebe0;
       --chalk-dim: rgba(240,235,224,0.55);
       --white: #faf9f5;
@@ -42,8 +42,6 @@
       inset: 0;
       background:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='1' cy='1' r='0.6' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E") repeat,
-        radial-gradient(ellipse at 20% 0%, rgba(18,116,59,0.4) 0%, transparent 55%),
-        radial-gradient(ellipse at 80% 100%, rgba(5,31,16,0.6) 0%, transparent 55%),
         var(--felt-dark);
       pointer-events: none;
       z-index: 0;
@@ -493,7 +491,7 @@
         .map(i => i.name);
     }
 
-    // ── Carica tutti i temi ────────────────────────────────────────────────────
+    // ── Carica tutti i temi da temi.json (no API, no rate limit) ─────────────
     async function loadTemi(forceRefresh = false) {
       const grid = document.getElementById('themes-grid');
       const btn  = document.getElementById('refresh-btn');
@@ -502,32 +500,29 @@
       showSkeletons(grid, 6);
 
       try {
-        const cartelle = await listCartelle();
+        const nomi = await fetch(`${RAW}/temi.json`).then(r => r.json());
 
-        // Per ogni cartella, carica i file in parallelo
+        // Per ogni tema, carica la lista file via API (una sola volta, poi usiamo raw)
         const temi = await Promise.all(
-          cartelle.map(async c => {
+          nomi.map(async nome => {
             try {
-              const files = await listJpg(c.name);
-              if (files.length === 0) return null;
+              const files = await listJpg(nome);
               const homeBg = files.find(f => f.toLowerCase() === 'home-bg.jpg');
-              const avatar = files.filter(f => f.toLowerCase() !== 'home-bg.jpg');
-              return { id: c.name, nome: c.name, homeBg: !!homeBg, avatar };
+              const avatar = files.filter(f => f.toLowerCase() !== 'home-bg.jpg' && f.toLowerCase() !== 'palette.json');
+              return { id: nome, nome, homeBg: !!homeBg, avatar };
             } catch {
-              return null;
+              return { id: nome, nome, homeBg: true, avatar: [] };
             }
           })
         );
 
-        const temiValidi = temi.filter(Boolean);
-
-        if (temiValidi.length === 0) {
+        if (temi.length === 0) {
           grid.innerHTML = '';
-          grid.appendChild(erroreState('Nessun tema trovato nella repo.'));
+          grid.appendChild(erroreState('Nessun tema trovato.'));
           return;
         }
 
-        renderThemeGrid(grid, temiValidi);
+        renderThemeGrid(grid, temi);
       } catch (err) {
         grid.innerHTML = '';
         grid.appendChild(erroreState('Impossibile caricare i temi.\nControlla la connessione.', true));
@@ -589,10 +584,14 @@
             root.style.setProperty('--felt-dark',  hex(p['felt-dark'])  || hex(p.felt));
             root.style.setProperty('--felt-deep',  hex(p['felt-dark'])  || hex(p.felt));
             root.style.setProperty('--felt-light', hex(p['felt-light']) || hex(p.felt));
-            if (p.accent) {
-              root.style.setProperty('--chalk',     hex(p.accent));
-              root.style.setProperty('--chalk-dim', hex(p.accent) + '8c');
-            }
+          }
+          if (p && p.accent) {
+            const a = hex(p.accent);
+            root.style.setProperty('--chalk',      a);
+            root.style.setProperty('--chalk-dim',  a + '8c');
+            root.style.setProperty('--gold',       a);
+            root.style.setProperty('--gold-light', hex(p['accent-secondary']) || a);
+            root.style.setProperty('--gold-dim',   a + '2e');
           }
         })
         .catch(() => {});
@@ -600,7 +599,7 @@
 
     function ripristinaPalette() {
       const root = document.documentElement;
-      ['--felt','--felt-dark','--felt-deep','--felt-light','--chalk','--chalk-dim'].forEach(v => root.style.removeProperty(v));
+      ['--felt','--felt-dark','--felt-deep','--felt-light','--chalk','--chalk-dim','--gold','--gold-light','--gold-dim'].forEach(v => root.style.removeProperty(v));
     }
 
     // ── Mostra galleria tema ───────────────────────────────────────────────────
