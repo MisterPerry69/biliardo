@@ -76,7 +76,6 @@
       color: var(--gold-light);
       letter-spacing: 0.02em;
       line-height: 1;
-      text-shadow: 0 2px 12px rgba(201,168,76,0.35);
     }
     .site-subtitle {
       font-size: 0.78rem;
@@ -226,7 +225,6 @@
       font-weight: 700;
       color: var(--chalk);
       line-height: 1.1;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
     }
     .theme-card-count {
       font-size: 0.68rem;
@@ -364,6 +362,64 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 4px; }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(3,12,6,0.96);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+    .lightbox.open {
+      display: flex;
+      animation: lbIn 0.22s cubic-bezier(.25,.46,.45,.94) both;
+    }
+    @keyframes lbIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 12px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.8);
+      object-fit: contain;
+      animation: lbImgIn 0.25s cubic-bezier(.34,1.4,.64,1) both;
+    }
+    @keyframes lbImgIn {
+      from { transform: scale(0.88); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .lightbox-name {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Caveat', cursive;
+      font-size: 1.4rem;
+      color: var(--chalk);
+      white-space: nowrap;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(5,31,16,0.7);
+      border: 1.5px solid rgba(201,168,76,0.4);
+      border-radius: 50%;
+      color: var(--gold);
+      font-size: 1.2rem;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .lightbox-close:active { background: var(--gold-dim); transform: scale(0.88); }
   </style>
 </head>
 <body>
@@ -381,6 +437,13 @@
       </svg>
     </button>
   </header>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Chiudi">&#x2715;</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="">
+    <div class="lightbox-name" id="lightbox-name"></div>
+  </div>
 
   <div id="page-home">
     <div class="themes-grid" id="themes-grid"></div>
@@ -547,6 +610,7 @@
             </div>
             <div class="avatar-name">${escHtml(nome)}</div>
           `;
+          card.querySelector('.avatar-img-wrap').addEventListener('click', () => openLightbox(imgUrl, nome));
           grid.appendChild(card);
         });
 
@@ -609,6 +673,27 @@
       `;
       return div;
     }
+
+    // ── Lightbox ───────────────────────────────────────────────────────────────
+    function openLightbox(imgUrl, nome) {
+      const lb   = document.getElementById('lightbox');
+      const img  = document.getElementById('lightbox-img');
+      const name = document.getElementById('lightbox-name');
+      img.src = imgUrl;
+      img.alt = nome;
+      name.textContent = nome;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      const lb = document.getElementById('lightbox');
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Chiudi con tasto Escape
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
     function escHtml(s) {
       return String(s)
