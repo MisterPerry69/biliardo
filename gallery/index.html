@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🎱 Galleria Temi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --felt: #0c5c30;
+      --felt-dark: #083d20;
+      --felt-deep: #051f10;
+      --felt-light: #12743b;
+      --gold: #c9a84c;
+      --gold-light: #e8c96a;
+      --gold-dim: rgba(201,168,76,0.18);
+      --chalk: #f0ebe0;
+      --chalk-dim: rgba(240,235,224,0.55);
+      --white: #faf9f5;
+      --shadow-strong: rgba(0,0,0,0.55);
+      --shadow-soft: rgba(0,0,0,0.25);
+      --radius-card: 16px;
+      --radius-avatar: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      min-height: 100%;
+      background: var(--felt-deep);
+      color: var(--chalk);
+      font-family: 'DM Sans', sans-serif;
+      overscroll-behavior-y: none;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='1' cy='1' r='0.6' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E") repeat,
+        radial-gradient(ellipse at 20% 0%, rgba(18,116,59,0.4) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 100%, rgba(5,31,16,0.6) 0%, transparent 55%),
+        var(--felt-dark);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: relative;
+      z-index: 10;
+      padding: 28px 52px 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+    }
+    .site-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .site-title {
+      font-family: 'Caveat', cursive;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      text-shadow: 0 2px 12px rgba(201,168,76,0.35);
+    }
+    .site-subtitle {
+      font-size: 0.78rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--chalk-dim);
+      margin-top: 6px;
+    }
+
+    /* ── Back button ── */
+    .back-btn {
+      display: none;
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 1.6rem;
+      cursor: pointer;
+      padding: 8px 10px;
+      line-height: 1;
+      z-index: 20;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .back-btn:active { transform: translateY(-50%) scale(0.88); color: var(--gold-light); }
+    .back-btn.visible { display: flex; align-items: center; }
+
+    /* ── Refresh button ── */
+    .refresh-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: 1.5px solid rgba(201,168,76,0.35);
+      border-radius: 50%;
+      color: var(--gold);
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .refresh-btn:active { background: var(--gold-dim); transform: translateY(-50%) scale(0.88); }
+    .refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
+    .refresh-btn.hidden { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Pages ── */
+    #page-home, #page-theme {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 90px);
+    }
+    #page-theme { display: none; }
+
+    /* ── Theme grid ── */
+    .themes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 20px 16px 40px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Skeleton loading ── */
+    .skeleton {
+      border-radius: var(--radius-card);
+      aspect-ratio: 3/4;
+      background: linear-gradient(110deg, var(--felt-dark) 30%, rgba(18,116,59,0.3) 50%, var(--felt-dark) 70%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border: 1.5px solid rgba(201,168,76,0.08);
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Theme card ── */
+    .theme-card {
+      position: relative;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      aspect-ratio: 3/4;
+      cursor: pointer;
+      border: 1.5px solid rgba(201,168,76,0.15);
+      box-shadow: 0 6px 24px var(--shadow-strong);
+      transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease, border-color 0.22s ease;
+      animation: cardIn 0.4s cubic-bezier(.34,1.4,.64,1) both;
+    }
+    .theme-card:active { transform: scale(0.94); box-shadow: 0 2px 10px var(--shadow-strong); }
+    @media (hover: hover) {
+      .theme-card:hover {
+        transform: translateY(-4px) scale(1.015);
+        box-shadow: 0 12px 36px var(--shadow-strong);
+        border-color: rgba(201,168,76,0.5);
+      }
+    }
+    .theme-card::before {
+      content: '';
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 20px; height: 20px;
+      border-top: 2px solid var(--gold);
+      border-right: 2px solid var(--gold);
+      border-radius: 0 4px 0 0;
+      opacity: 0.5;
+      z-index: 2;
+    }
+
+    .theme-card-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .theme-card-bg.no-image {
+      background: linear-gradient(135deg, var(--felt) 0%, var(--felt-dark) 60%, var(--felt-deep) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      opacity: 0.9;
+    }
+
+    .theme-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(3,18,8,0.88) 0%, rgba(3,18,8,0.25) 50%, transparent 100%);
+    }
+    .theme-card-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 12px 12px 14px;
+    }
+    .theme-card-name {
+      font-family: 'Caveat', cursive;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--chalk);
+      line-height: 1.1;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+    }
+    .theme-card-count {
+      font-size: 0.68rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 3px;
+      opacity: 0.9;
+    }
+
+    /* ── Avatar grid ── */
+    .avatars-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 18px 16px 48px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .avatar-card {
+      position: relative;
+      border-radius: var(--radius-avatar);
+      overflow: hidden;
+      background: var(--felt-dark);
+      border: 1.5px solid rgba(201,168,76,0.12);
+      box-shadow: 0 4px 16px var(--shadow-soft);
+      animation: cardIn 0.35s cubic-bezier(.34,1.4,.64,1) both;
+    }
+    .avatar-card:nth-child(1) { animation-delay: 0.04s; }
+    .avatar-card:nth-child(2) { animation-delay: 0.08s; }
+    .avatar-card:nth-child(3) { animation-delay: 0.12s; }
+    .avatar-card:nth-child(4) { animation-delay: 0.16s; }
+    .avatar-card:nth-child(5) { animation-delay: 0.20s; }
+    .avatar-card:nth-child(6) { animation-delay: 0.24s; }
+    .avatar-card:nth-child(7) { animation-delay: 0.28s; }
+    .avatar-card:nth-child(8) { animation-delay: 0.32s; }
+
+    .avatar-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1/1;
+      overflow: hidden;
+      background: var(--felt);
+    }
+    .avatar-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease;
+    }
+    .avatar-card:active .avatar-img { transform: scale(1.04); }
+
+    .avatar-placeholder {
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      opacity: 0.3;
+    }
+
+    .avatar-download {
+      position: absolute;
+      bottom: 8px; right: 8px;
+      width: 34px; height: 34px;
+      background: rgba(5,31,16,0.82);
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.9rem;
+      backdrop-filter: blur(4px);
+      transition: background 0.2s, transform 0.15s;
+      z-index: 3;
+    }
+    .avatar-download:active {
+      background: var(--gold);
+      color: var(--felt-deep);
+      transform: scale(0.88);
+    }
+
+    .avatar-name {
+      padding: 10px 10px 12px;
+      font-family: 'Caveat', cursive;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--chalk);
+      letter-spacing: 0.02em;
+      text-align: center;
+      border-top: 1px solid rgba(201,168,76,0.1);
+    }
+
+    /* ── Error / empty state ── */
+    .state-msg {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--chalk-dim);
+    }
+    .state-msg .emoji { font-size: 2.8rem; margin-bottom: 12px; }
+    .state-msg p { font-size: 0.95rem; line-height: 1.6; }
+    .state-msg button {
+      margin-top: 18px;
+      background: var(--gold-dim);
+      border: 1.5px solid var(--gold);
+      color: var(--gold-light);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      padding: 10px 22px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .state-msg button:active { background: rgba(201,168,76,0.3); }
+
+    /* ── Page transitions ── */
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .page-enter { animation: pageIn 0.3s cubic-bezier(.25,.46,.45,.94) both; }
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateX(24px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .page-exit { animation: pageOut 0.22s ease both; }
+    @keyframes pageOut {
+      to { opacity: 0; transform: translateX(-20px); }
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header" id="site-header">
+    <button class="back-btn" id="back-btn" onclick="showHome()" aria-label="Torna ai temi">&#8592;</button>
+    <div>
+      <div class="site-title" id="header-title">🎱 Galleria Temi</div>
+      <div class="site-subtitle" id="header-sub">Sabongia Boys Edition</div>
+    </div>
+    <button class="refresh-btn" id="refresh-btn" onclick="loadTemi(true)" aria-label="Aggiorna temi" title="Aggiorna">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10"></polyline>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+      </svg>
+    </button>
+  </header>
+
+  <div id="page-home">
+    <div class="themes-grid" id="themes-grid"></div>
+  </div>
+
+  <div id="page-theme">
+    <div class="avatars-grid" id="avatars-grid"></div>
+  </div>
+
+  <script>
+    const REPO    = 'misterperry69/biliardo';
+    const BRANCH  = 'main';
+    const RAW     = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
+    const API     = `https://api.github.com/repos/${REPO}/contents`;
+
+    // Nomi speciali: filename (senza ext) → display name
+    const NOME_DISPLAY = {
+      annamarinarossa: 'Annamarina',
+      unknow: '???',
+    };
+
+    // Cartelle da ignorare sempre
+    const IGNORE = new Set(['gallery', 'bkp', '.git', '.github']);
+
+    function nomeDisplay(filename) {
+      const base = filename.replace(/\.[^.]+$/, '').toLowerCase();
+      if (NOME_DISPLAY[base]) return NOME_DISPLAY[base];
+      return base.charAt(0).toUpperCase() + base.slice(1);
+    }
+
+    // ── GitHub API helpers ─────────────────────────────────────────────────────
+    async function apiFetch(path) {
+      const res = await fetch(`${API}/${path}`);
+      if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+      return res.json();
+    }
+
+    async function listCartelle() {
+      const items = await apiFetch('');
+      return items.filter(i => i.type === 'dir' && !IGNORE.has(i.name.toLowerCase()));
+    }
+
+    async function listJpg(cartella) {
+      const items = await apiFetch(encodeURIComponent(cartella));
+      return items
+        .filter(i => i.type === 'file' && /\.(jpg|jpeg|png|webp)$/i.test(i.name))
+        .map(i => i.name);
+    }
+
+    // ── Carica tutti i temi ────────────────────────────────────────────────────
+    async function loadTemi(forceRefresh = false) {
+      const grid = document.getElementById('themes-grid');
+      const btn  = document.getElementById('refresh-btn');
+
+      btn.classList.add('spinning');
+      showSkeletons(grid, 6);
+
+      try {
+        const cartelle = await listCartelle();
+
+        // Per ogni cartella, carica i file in parallelo
+        const temi = await Promise.all(
+          cartelle.map(async c => {
+            try {
+              const files = await listJpg(c.name);
+              if (files.length === 0) return null;
+              const homeBg = files.find(f => f.toLowerCase() === 'home-bg.jpg');
+              const avatar = files.filter(f => f.toLowerCase() !== 'home-bg.jpg');
+              return { id: c.name, nome: c.name, homeBg: !!homeBg, avatar };
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        const temiValidi = temi.filter(Boolean);
+
+        if (temiValidi.length === 0) {
+          grid.innerHTML = '';
+          grid.appendChild(erroreState('Nessun tema trovato nella repo.'));
+          return;
+        }
+
+        renderThemeGrid(grid, temiValidi);
+      } catch (err) {
+        grid.innerHTML = '';
+        grid.appendChild(erroreState('Impossibile caricare i temi.\nControlla la connessione.', true));
+      } finally {
+        btn.classList.remove('spinning');
+      }
+    }
+
+    // ── Render griglia temi ────────────────────────────────────────────────────
+    function renderThemeGrid(grid, temi) {
+      grid.innerHTML = '';
+      temi.forEach((tema, i) => {
+        const card = document.createElement('div');
+        card.className = 'theme-card';
+        card.style.animationDelay = (i * 0.055) + 's';
+        card.onclick = () => showTheme(tema);
+
+        const bgDiv = document.createElement('div');
+        if (tema.homeBg) {
+          const bgUrl = `${RAW}/${encodeURIComponent(tema.id)}/home-bg.jpg`;
+          bgDiv.className = 'theme-card-bg';
+          bgDiv.style.backgroundImage = `url("${bgUrl}")`;
+          // fallback se l'immagine non carica
+          const probe = new Image();
+          probe.onerror = () => {
+            bgDiv.className = 'theme-card-bg no-image';
+            bgDiv.style.backgroundImage = '';
+            bgDiv.textContent = '🎱';
+          };
+          probe.src = bgUrl;
+        } else {
+          bgDiv.className = 'theme-card-bg no-image';
+          bgDiv.textContent = '🎱';
+        }
+
+        card.appendChild(bgDiv);
+        card.innerHTML += `
+          <div class="theme-card-overlay"></div>
+          <div class="theme-card-label">
+            <div class="theme-card-name">${escHtml(tema.nome)}</div>
+            <div class="theme-card-count">${tema.avatar.length} avatar</div>
+          </div>
+        `;
+        // re-inserisci bgDiv perché innerHTML l'ha sovrascritto
+        card.insertBefore(bgDiv, card.firstChild);
+        grid.appendChild(card);
+      });
+    }
+
+    // ── Mostra galleria tema ───────────────────────────────────────────────────
+    function showTheme(tema) {
+      const pageHome  = document.getElementById('page-home');
+      const pageTheme = document.getElementById('page-theme');
+      const backBtn   = document.getElementById('back-btn');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const headerTitle = document.getElementById('header-title');
+      const headerSub   = document.getElementById('header-sub');
+      const grid        = document.getElementById('avatars-grid');
+
+      pageHome.classList.add('page-exit');
+      setTimeout(() => {
+        pageHome.style.display = 'none';
+        pageHome.classList.remove('page-exit');
+
+        grid.innerHTML = '';
+        tema.avatar.forEach(filename => {
+          const imgUrl  = `${RAW}/${encodeURIComponent(tema.id)}/${encodeURIComponent(filename)}`;
+          const nome    = nomeDisplay(filename);
+          const dlName  = `${tema.nome.toLowerCase()}_${filename}`;
+
+          const card = document.createElement('div');
+          card.className = 'avatar-card';
+          card.innerHTML = `
+            <div class="avatar-img-wrap">
+              <img class="avatar-img" src="${imgUrl}" alt="${escHtml(nome)}" loading="lazy"
+                   onerror="this.parentNode.innerHTML='<div class=\\'avatar-placeholder\\'>👤</div>'">
+              <a class="avatar-download" href="${imgUrl}" download="${escHtml(dlName)}"
+                 target="_blank" rel="noopener" title="Scarica ${escHtml(nome)}"
+                 onclick="event.stopPropagation()">&#8595;</a>
+            </div>
+            <div class="avatar-name">${escHtml(nome)}</div>
+          `;
+          grid.appendChild(card);
+        });
+
+        headerTitle.textContent = tema.nome;
+        headerSub.textContent   = `${tema.avatar.length} avatar`;
+        backBtn.classList.add('visible');
+        refreshBtn.classList.add('hidden');
+
+        pageTheme.style.display = 'block';
+        pageTheme.classList.add('page-enter');
+        setTimeout(() => pageTheme.classList.remove('page-enter'), 350);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 200);
+    }
+
+    // ── Torna home ─────────────────────────────────────────────────────────────
+    function showHome() {
+      const pageHome   = document.getElementById('page-home');
+      const pageTheme  = document.getElementById('page-theme');
+      const backBtn    = document.getElementById('back-btn');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const headerTitle = document.getElementById('header-title');
+      const headerSub   = document.getElementById('header-sub');
+
+      pageTheme.classList.add('page-exit');
+      setTimeout(() => {
+        pageTheme.style.display = 'none';
+        pageTheme.classList.remove('page-exit');
+
+        headerTitle.textContent = '🎱 Galleria Temi';
+        headerSub.textContent   = 'Sabongia Boys Edition';
+        backBtn.classList.remove('visible');
+        refreshBtn.classList.remove('hidden');
+
+        pageHome.style.display = 'block';
+        pageHome.classList.add('page-enter');
+        setTimeout(() => pageHome.classList.remove('page-enter'), 350);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 200);
+    }
+
+    // ── UI helpers ─────────────────────────────────────────────────────────────
+    function showSkeletons(container, n) {
+      container.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const s = document.createElement('div');
+        s.className = 'skeleton';
+        s.style.animationDelay = (i * 0.08) + 's';
+        container.appendChild(s);
+      }
+    }
+
+    function erroreState(msg, canRetry = false) {
+      const div = document.createElement('div');
+      div.className = 'state-msg';
+      div.innerHTML = `
+        <div class="emoji">😵</div>
+        <p>${escHtml(msg).replace(/\n/g, '<br>')}</p>
+        ${canRetry ? '<button onclick="loadTemi(true)">Riprova</button>' : ''}
+      `;
+      return div;
+    }
+
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Boot ───────────────────────────────────────────────────────────────────
+    loadTemi();
+  </script>
+</body>
+</html>
