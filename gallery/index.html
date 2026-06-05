@@ -577,6 +577,32 @@
       });
     }
 
+    // ── Palette tema ──────────────────────────────────────────────────────────
+    function applicaPalette(temaId) {
+      fetch(`${RAW}/${encodeURIComponent(temaId)}/palette.json`)
+        .then(r => r.ok ? r.json() : null)
+        .then(p => {
+          const root = document.documentElement;
+          const hex = v => v ? (v.startsWith('#') ? v : '#' + v) : null;
+          if (p && p.felt) {
+            root.style.setProperty('--felt',       hex(p.felt));
+            root.style.setProperty('--felt-dark',  hex(p['felt-dark'])  || hex(p.felt));
+            root.style.setProperty('--felt-deep',  hex(p['felt-dark'])  || hex(p.felt));
+            root.style.setProperty('--felt-light', hex(p['felt-light']) || hex(p.felt));
+            if (p.accent) {
+              root.style.setProperty('--chalk',     hex(p.accent));
+              root.style.setProperty('--chalk-dim', hex(p.accent) + '8c');
+            }
+          }
+        })
+        .catch(() => {});
+    }
+
+    function ripristinaPalette() {
+      const root = document.documentElement;
+      ['--felt','--felt-dark','--felt-deep','--felt-light','--chalk','--chalk-dim'].forEach(v => root.style.removeProperty(v));
+    }
+
     // ── Mostra galleria tema ───────────────────────────────────────────────────
     function showTheme(tema) {
       const pageHome  = document.getElementById('page-home');
@@ -586,6 +612,8 @@
       const headerTitle = document.getElementById('header-title');
       const headerSub   = document.getElementById('header-sub');
       const grid        = document.getElementById('avatars-grid');
+
+      applicaPalette(tema.id);
 
       pageHome.classList.add('page-exit');
       setTimeout(() => {
@@ -635,6 +663,7 @@
       const headerTitle = document.getElementById('header-title');
       const headerSub   = document.getElementById('header-sub');
 
+      ripristinaPalette();
       pageTheme.classList.add('page-exit');
       setTimeout(() => {
         pageTheme.style.display = 'none';

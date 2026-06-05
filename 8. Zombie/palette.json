@@ -1,6 +1,6 @@
 {
-  "felt": "",
-  "felt-dark": "",
-  "accent": "",
-  "accent-secondary": ""
+  "felt": "#3b5843",
+  "felt-dark": "#1d2c21",
+  "accent": "#910b0b",
+  "accent-secondary": "#6e4e37"
 }
