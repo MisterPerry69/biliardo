@@ -492,6 +492,8 @@
     }
 
     // ── Carica tutti i temi da temi.json (no API, no rate limit) ─────────────
+    let _avatarList = [];
+
     async function loadTemi(forceRefresh = false) {
       const grid = document.getElementById('themes-grid');
       const btn  = document.getElementById('refresh-btn');
@@ -500,21 +502,13 @@
       showSkeletons(grid, 6);
 
       try {
-        const nomi = await fetch(`${RAW}/temi.json`).then(r => r.json());
+        const data  = await fetch(`${RAW}/temi.json`).then(r => r.json());
+        const nomi  = data.temi  || data;
+        _avatarList = data.avatar || [];
 
-        // Per ogni tema, carica la lista file via API (una sola volta, poi usiamo raw)
-        const temi = await Promise.all(
-          nomi.map(async nome => {
-            try {
-              const files = await listJpg(nome);
-              const homeBg = files.find(f => f.toLowerCase() === 'home-bg.jpg');
-              const avatar = files.filter(f => f.toLowerCase() !== 'home-bg.jpg' && f.toLowerCase() !== 'palette.json');
-              return { id: nome, nome, homeBg: !!homeBg, avatar };
-            } catch {
-              return { id: nome, nome, homeBg: true, avatar: [] };
-            }
-          })
-        );
+        const temi = nomi.map(nome => ({
+          id: nome, nome, homeBg: true, avatar: _avatarList
+        }));
 
         if (temi.length === 0) {
           grid.innerHTML = '';

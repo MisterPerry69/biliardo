@@ -1,13 +1,27 @@
-[
-  "Original",
-  "1. Peaky Blinders",
-  "2. Harry Potter",
-  "2. Nazisti",
-  "3. Persone di Colore (nero)",
-  "4. Lords",
-  "5. Sailor Moon",
-  "6. Space",
-  "7. Videogame",
-  "8. Zombie",
-  "9. Linkedin"
-]
+{
+  "avatar": [
+    "anghela.jpg",
+    "annamarinarossa.jpg",
+    "fedora.jpg",
+    "giulio.jpg",
+    "marteo.jpg",
+    "perly.jpg",
+    "rivarolo.jpg",
+    "porg.jpg",
+    "unknow.jpg"
+  ],
+  "temi": [
+    "Original",
+    "1. Peaky Blinders",
+    "2. Harry Potter",
+    "2. Nazisti",
+    "3. Persone di Colore (nero)",
+    "4. Lords",
+    "5. Sailor Moon",
+    "6. Space",
+    "7. Videogame",
+    "8. Zombie",
+    "9. Linkedin",
+    "ratti"
+  ]
+}
