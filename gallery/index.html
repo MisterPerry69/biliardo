@@ -614,6 +614,7 @@
         pageHome.classList.remove('page-exit');
 
         grid.innerHTML = '';
+        let loadedCount = 0;
         tema.avatar.forEach(filename => {
           const imgUrl  = `${RAW}/${encodeURIComponent(tema.id)}/${encodeURIComponent(filename)}`;
           const nome    = nomeDisplay(filename);
@@ -623,20 +624,25 @@
           card.className = 'avatar-card';
           card.innerHTML = `
             <div class="avatar-img-wrap">
-              <img class="avatar-img" src="${imgUrl}" alt="${escHtml(nome)}" loading="lazy"
-                   onerror="this.parentNode.innerHTML='<div class=\\'avatar-placeholder\\'>👤</div>'">
+              <img class="avatar-img" src="${imgUrl}" alt="${escHtml(nome)}" loading="lazy">
               <a class="avatar-download" href="${imgUrl}" download="${escHtml(dlName)}"
                  target="_blank" rel="noopener" title="Scarica ${escHtml(nome)}"
                  onclick="event.stopPropagation()">&#8595;</a>
             </div>
             <div class="avatar-name">${escHtml(nome)}</div>
           `;
+          const img = card.querySelector('.avatar-img');
+          img.onload = () => {
+            loadedCount++;
+            headerSub.textContent = `${loadedCount} avatar`;
+          };
+          img.onerror = () => { card.remove(); };
           card.querySelector('.avatar-img-wrap').addEventListener('click', () => openLightbox(imgUrl, nome));
           grid.appendChild(card);
         });
 
         headerTitle.textContent = tema.nome;
-        headerSub.textContent   = `${tema.avatar.length} avatar`;
+        headerSub.textContent   = '...';
         backBtn.classList.add('visible');
         refreshBtn.classList.add('hidden');
 
