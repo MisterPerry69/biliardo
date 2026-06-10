@@ -288,11 +288,11 @@
       align-items: center;
       justify-content: center;
       color: var(--gold);
-      text-decoration: none;
       font-size: 0.75rem;
       backdrop-filter: blur(4px);
       transition: background 0.2s, transform 0.15s;
       z-index: 3;
+      cursor: pointer;
     }
     .avatar-download:active {
       background: var(--gold);
@@ -695,9 +695,8 @@
           card.innerHTML = `
             <div class="avatar-img-wrap">
               <img class="avatar-img" src="${imgUrl}" alt="${escHtml(nome)}" loading="lazy">
-              <a class="avatar-download" href="${imgUrl}" download="${escHtml(dlName)}"
-                 target="_blank" rel="noopener" title="Scarica ${escHtml(nome)}"
-                 onclick="event.stopPropagation()">&#8595;</a>
+              <button class="avatar-download" title="Scarica ${escHtml(nome)}"
+                 onclick="event.stopPropagation();downloadImg('${imgUrl}','${escHtml(dlName)}')">&#8595;</button>
             </div>
             <div class="avatar-name">${escHtml(nome)}</div>
           `;
@@ -801,6 +800,19 @@
 
     // Chiudi con tasto Escape
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    async function downloadImg(url, filename) {
+      try {
+        const blob = await fetch(url).then(r => r.blob());
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+      } catch {
+        window.open(url, '_blank');
+      }
+    }
 
     function escHtml(s) {
       return String(s)
