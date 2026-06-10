@@ -237,35 +237,35 @@
     /* ── Avatar grid ── */
     .avatars-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      padding: 18px 16px 48px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 14px 12px 48px;
       max-width: 520px;
       margin: 0 auto;
     }
 
     .avatar-card {
       position: relative;
-      border-radius: var(--radius-avatar);
+      border-radius: 10px;
       overflow: hidden;
       background: var(--felt-dark);
       border: 1.5px solid rgba(201,168,76,0.12);
       box-shadow: 0 4px 16px var(--shadow-soft);
       animation: cardIn 0.35s cubic-bezier(.34,1.4,.64,1) both;
     }
-    .avatar-card:nth-child(1) { animation-delay: 0.04s; }
-    .avatar-card:nth-child(2) { animation-delay: 0.08s; }
-    .avatar-card:nth-child(3) { animation-delay: 0.12s; }
-    .avatar-card:nth-child(4) { animation-delay: 0.16s; }
-    .avatar-card:nth-child(5) { animation-delay: 0.20s; }
-    .avatar-card:nth-child(6) { animation-delay: 0.24s; }
-    .avatar-card:nth-child(7) { animation-delay: 0.28s; }
-    .avatar-card:nth-child(8) { animation-delay: 0.32s; }
+    .avatar-card:nth-child(1) { animation-delay: 0.03s; }
+    .avatar-card:nth-child(2) { animation-delay: 0.06s; }
+    .avatar-card:nth-child(3) { animation-delay: 0.09s; }
+    .avatar-card:nth-child(4) { animation-delay: 0.12s; }
+    .avatar-card:nth-child(5) { animation-delay: 0.15s; }
+    .avatar-card:nth-child(6) { animation-delay: 0.18s; }
+    .avatar-card:nth-child(7) { animation-delay: 0.21s; }
+    .avatar-card:nth-child(8) { animation-delay: 0.24s; }
 
     .avatar-img-wrap {
       position: relative;
       width: 100%;
-      aspect-ratio: 1/1;
+      aspect-ratio: 1260 / 2562;
       overflow: hidden;
       background: var(--felt);
     }
@@ -277,19 +277,10 @@
     }
     .avatar-card:active .avatar-img { transform: scale(1.04); }
 
-    .avatar-placeholder {
-      width: 100%; height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      opacity: 0.3;
-    }
-
     .avatar-download {
       position: absolute;
-      bottom: 8px; right: 8px;
-      width: 34px; height: 34px;
+      bottom: 6px; right: 6px;
+      width: 28px; height: 28px;
       background: rgba(5,31,16,0.82);
       border: 1.5px solid var(--gold);
       border-radius: 50%;
@@ -298,7 +289,7 @@
       justify-content: center;
       color: var(--gold);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       backdrop-filter: blur(4px);
       transition: background 0.2s, transform 0.15s;
       z-index: 3;
@@ -310,14 +301,86 @@
     }
 
     .avatar-name {
-      padding: 10px 10px 12px;
+      padding: 7px 6px 8px;
       font-family: 'Caveat', cursive;
-      font-size: 1.15rem;
+      font-size: 0.95rem;
       font-weight: 500;
       color: var(--chalk);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
       text-align: center;
       border-top: 1px solid rgba(201,168,76,0.1);
+    }
+
+    /* ── Bloopers ── */
+    #page-bloopers { display: none; position: relative; z-index: 1; min-height: calc(100vh - 90px); }
+
+    .bloopers-header {
+      text-align: center;
+      padding: 24px 16px 8px;
+      position: relative;
+    }
+    .bloopers-stamp {
+      display: inline-block;
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: rgba(220,38,38,0.85);
+      border: 2px solid rgba(220,38,38,0.6);
+      border-radius: 4px;
+      padding: 3px 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transform: rotate(-2deg);
+    }
+
+    .bloopers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 14px 12px 48px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .blooper-card {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #1a0a0a;
+      border: 1px solid rgba(220,38,38,0.2);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+      cursor: pointer;
+      animation: cardIn 0.35s cubic-bezier(.34,1.4,.64,1) both;
+    }
+    .blooper-card:active { transform: scale(0.95); }
+
+    .blooper-img-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: #1a0a0a;
+      position: relative;
+    }
+    .blooper-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(0.7) contrast(1.1);
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+    .blooper-card:active .blooper-img { filter: saturate(1) contrast(1); transform: scale(1.04); }
+
+    .blooper-x {
+      position: absolute;
+      top: 4px; left: 4px;
+      width: 20px; height: 20px;
+      background: rgba(220,38,38,0.85);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem;
+      color: white;
+      font-weight: 900;
+      z-index: 2;
     }
 
     /* ── Error / empty state ── */
@@ -425,7 +488,7 @@
   <header class="site-header" id="site-header">
     <button class="back-btn" id="back-btn" onclick="showHome()" aria-label="Torna ai temi">&#8592;</button>
     <div>
-      <div class="site-title" id="header-title">🎱 Galleria Temi</div>
+      <div class="site-title" id="header-title"><span id="ball-trigger" onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> Galleria Temi</div>
       <div class="site-subtitle" id="header-sub">Sabongia Boys Edition</div>
     </div>
     <button class="refresh-btn" id="refresh-btn" onclick="loadTemi(true)" aria-label="Aggiorna temi" title="Aggiorna">
@@ -449,6 +512,13 @@
 
   <div id="page-theme">
     <div class="avatars-grid" id="avatars-grid"></div>
+  </div>
+
+  <div id="page-bloopers">
+    <div class="bloopers-header">
+      <div class="bloopers-stamp">Hall of Shame</div>
+    </div>
+    <div class="bloopers-grid" id="bloopers-grid"></div>
   </div>
 
   <script>
@@ -727,6 +797,94 @@
       return String(s)
         .replace(/&/g,'&amp;').replace(/</g,'&lt;')
         .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Bloopers ───────────────────────────────────────────────────────────────
+    let _ballTapCount = 0;
+    let _ballTapTimer = null;
+
+    function onBallTap() {
+      _ballTapCount++;
+      clearTimeout(_ballTapTimer);
+      if (_ballTapCount >= 3) {
+        _ballTapCount = 0;
+        showBloopers();
+      } else {
+        _ballTapTimer = setTimeout(() => { _ballTapCount = 0; }, 800);
+      }
+    }
+
+    function showBloopers() {
+      const active = document.querySelector('[id^="page-"]:not([style*="display: none"])') ||
+                     document.getElementById('page-home');
+      active.classList.add('page-exit');
+      setTimeout(() => {
+        active.style.display = 'none';
+        active.classList.remove('page-exit');
+      }, 220);
+
+      const pageBloopers = document.getElementById('page-bloopers');
+      const grid         = document.getElementById('bloopers-grid');
+      const headerTitle  = document.getElementById('header-title');
+      const headerSub    = document.getElementById('header-sub');
+      const backBtn      = document.getElementById('back-btn');
+      const refreshBtn   = document.getElementById('refresh-btn');
+
+      grid.innerHTML = '';
+      headerTitle.innerHTML = '<span id="ball-trigger" onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> Hall of Shame';
+      headerSub.textContent = '...';
+      backBtn.classList.add('visible');
+      refreshBtn.classList.add('hidden');
+
+      const bloopersUrl = `${RAW}/_bloopers/`;
+      fetch(`${RAW}/temi.json`)
+        .then(r => r.json())
+        .then(data => {
+          const list = data.bloopers || [];
+          if (list.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 16px;color:rgba(255,255,255,0.3);font-family:Caveat,cursive;font-size:1.2rem;">Nessuna foto... per ora 😈</div>';
+            headerSub.textContent = '0 foto';
+            return;
+          }
+          let loaded = 0;
+          list.forEach((filename, i) => {
+            const imgUrl = `${RAW}/_bloopers/${encodeURIComponent(filename)}`;
+            const card = document.createElement('div');
+            card.className = 'blooper-card';
+            card.style.animationDelay = (i * 0.04) + 's';
+            card.innerHTML = `
+              <div class="blooper-img-wrap">
+                <div class="blooper-x">✕</div>
+                <img class="blooper-img" src="${imgUrl}" alt="${escHtml(filename)}" loading="lazy">
+              </div>
+            `;
+            const img = card.querySelector('.blooper-img');
+            img.onload  = () => { loaded++; headerSub.textContent = `${loaded} foto`; };
+            img.onerror = () => { card.remove(); };
+            card.addEventListener('click', () => openLightbox(imgUrl, filename.replace(/\.[^.]+$/, '')));
+            grid.appendChild(card);
+          });
+        })
+        .catch(() => {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:rgba(220,38,38,0.5);">Errore caricamento</div>';
+        });
+
+      pageBloopers.style.display = 'block';
+      pageBloopers.classList.add('page-enter');
+      setTimeout(() => pageBloopers.classList.remove('page-enter'), 350);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    // Sovrascrive showHome per gestire anche il ritorno dai bloopers
+    const _origShowHome = showHome;
+    function showHome() {
+      document.getElementById('page-bloopers').style.display = 'none';
+      _origShowHome();
+      // ripristina il titolo con ball-trigger
+      setTimeout(() => {
+        const t = document.getElementById('header-title');
+        if (t) t.innerHTML = '<span id="ball-trigger" onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> Galleria Temi';
+      }, 250);
     }
 
     // ── Boot ───────────────────────────────────────────────────────────────────
