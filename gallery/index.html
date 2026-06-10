@@ -488,7 +488,7 @@
   <header class="site-header" id="site-header">
     <button class="back-btn" id="back-btn" onclick="showHome()" aria-label="Torna ai temi">&#8592;</button>
     <div>
-      <div class="site-title" id="header-title"><span id="ball-trigger" onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> Galleria Temi</div>
+      <div class="site-title" id="header-title"><span onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> Galleria Temi</div>
       <div class="site-subtitle" id="header-sub">Sabongia Boys Edition</div>
     </div>
     <button class="refresh-btn" id="refresh-btn" onclick="loadTemi(true)" aria-label="Aggiorna temi" title="Aggiorna">
@@ -711,7 +711,7 @@
           grid.appendChild(card);
         });
 
-        headerTitle.textContent = tema.nome;
+        headerTitle.innerHTML = `<span onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> ${escHtml(tema.nome)}`;
         headerSub.textContent   = '...';
         backBtn.classList.add('visible');
         refreshBtn.classList.add('hidden');
@@ -725,21 +725,30 @@
 
     // ── Torna home ─────────────────────────────────────────────────────────────
     function showHome() {
-      const pageHome   = document.getElementById('page-home');
-      const pageTheme  = document.getElementById('page-theme');
-      const backBtn    = document.getElementById('back-btn');
-      const refreshBtn = document.getElementById('refresh-btn');
-      const headerTitle = document.getElementById('header-title');
-      const headerSub   = document.getElementById('header-sub');
+      const pageHome     = document.getElementById('page-home');
+      const pageTheme    = document.getElementById('page-theme');
+      const pageBloopers = document.getElementById('page-bloopers');
+      const backBtn      = document.getElementById('back-btn');
+      const refreshBtn   = document.getElementById('refresh-btn');
+      const headerTitle  = document.getElementById('header-title');
+      const headerSub    = document.getElementById('header-sub');
+
+      // determina quale pagina è attiva
+      const activePage = pageTheme.style.display !== 'none' ? pageTheme
+                       : pageBloopers.style.display !== 'none' ? pageBloopers
+                       : null;
 
       ripristinaPalette();
-      pageTheme.classList.add('page-exit');
-      setTimeout(() => {
-        pageTheme.style.display = 'none';
-        pageTheme.classList.remove('page-exit');
 
-        headerTitle.textContent = '🎱 Galleria Temi';
-        headerSub.textContent   = 'Sabongia Boys Edition';
+      if (activePage) activePage.classList.add('page-exit');
+      setTimeout(() => {
+        if (activePage) {
+          activePage.style.display = 'none';
+          activePage.classList.remove('page-exit');
+        }
+
+        headerTitle.innerHTML = '<span id="ball-trigger" onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> Galleria Temi';
+        headerSub.textContent = 'Sabongia Boys Edition';
         backBtn.classList.remove('visible');
         refreshBtn.classList.remove('hidden');
 
@@ -873,18 +882,6 @@
       pageBloopers.classList.add('page-enter');
       setTimeout(() => pageBloopers.classList.remove('page-enter'), 350);
       window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-
-    // Sovrascrive showHome per gestire anche il ritorno dai bloopers
-    const _origShowHome = showHome;
-    function showHome() {
-      document.getElementById('page-bloopers').style.display = 'none';
-      _origShowHome();
-      // ripristina il titolo con ball-trigger
-      setTimeout(() => {
-        const t = document.getElementById('header-title');
-        if (t) t.innerHTML = '<span id="ball-trigger" onclick="onBallTap()" style="cursor:pointer;user-select:none;">🎱</span> Galleria Temi';
-      }, 250);
     }
 
     // ── Boot ───────────────────────────────────────────────────────────────────
