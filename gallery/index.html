@@ -139,17 +139,17 @@
     /* ── Theme grid ── */
     .themes-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      padding: 20px 16px 40px;
-      max-width: 520px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 16px 12px 40px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
     /* ── Skeleton loading ── */
     .skeleton {
       border-radius: var(--radius-card);
-      aspect-ratio: 3/4;
+      aspect-ratio: 3/5;
       background: linear-gradient(110deg, var(--felt-dark) 30%, rgba(18,116,59,0.3) 50%, var(--felt-dark) 70%);
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite;
@@ -165,7 +165,7 @@
       position: relative;
       border-radius: var(--radius-card);
       overflow: hidden;
-      aspect-ratio: 3/4;
+      aspect-ratio: 3/5;
       cursor: pointer;
       border: 1.5px solid rgba(201,168,76,0.15);
       box-shadow: 0 6px 24px var(--shadow-strong);
@@ -237,10 +237,10 @@
     /* ── Avatar grid ── */
     .avatars-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 14px 12px 48px;
-      max-width: 600px;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 18px 16px 48px;
+      max-width: 520px;
       margin: 0 auto;
     }
 
@@ -265,7 +265,7 @@
     .avatar-img-wrap {
       position: relative;
       width: 100%;
-      aspect-ratio: 1260 / 2562;
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       background: var(--felt);
     }
